@@ -8,14 +8,17 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
@@ -29,13 +32,17 @@ import javax.swing.event.ChangeListener;
 public class DrawSwing {
 
 	Border bline;
-	JButton clearB, blackB, blueB, greenB, redB, magB, yellowB, orangeB, pinkB, brownB;
-	JMenuItem menuItem;
+	JButton clearB, blackB, blueB, greenB, redB, magB, yellowB, orangeB, pinkB, brownB, lockB;
+	public static JMenuItem menuItem;
+	JMenu lock;
 	String[] jcbstuff = { "Pen", "Eraser" };
 	DrawArea da;
 	public static JComboBox<String> jcb;
 
 	public static JSpinner spinner;
+	
+	public static int wid;
+	public static int hei;
 
 	ActionListener act = new ActionListener() {
 		public void actionPerformed(ActionEvent e) {
@@ -46,7 +53,17 @@ public class DrawSwing {
 			}
 			
 			if (e.getSource() == menuItem) {
-				//TODO
+				DrawSaving.SaveL();
+			}
+			
+			if (e.getSource() == lockB) {
+				if (!DrawArea.isLocked()) {
+				    DrawArea.setLock(true);
+				lockB.setBackground(Color.RED);
+				} else {
+					DrawArea.setLock(false);
+					lockB.setBackground(Color.WHITE);
+				}
 			}
 			
 			if (jcb.getSelectedItem().equals("Pen")) {
@@ -69,7 +86,7 @@ public class DrawSwing {
 				} else if (e.getSource() == brownB) {
 					da.brown();
 				}
-			} 
+			}
 			
 			if (e.getSource() == jcb) {
 				da.updateTool(jcb.getSelectedItem());
@@ -156,6 +173,12 @@ public class DrawSwing {
 		magB.addActionListener(act);
 		magB.setForeground(new Color(255, 0, 255));
 		magB.setBackground(new Color(108, 0, 157));
+		
+		lockB = new JButton("");
+		lockB.addActionListener(act);
+		ImageIcon imgc1 = new ImageIcon(new ImageIcon(getClass().getResource("lock.png")).getImage().getScaledInstance(15, 15, Image.SCALE_DEFAULT));
+		lockB.setIcon(imgc1);
+		lockB.setToolTipText("Locks the Screen");
 
 		spinner = new JSpinner(new SpinnerNumberModel(2, 0, 40, 1));
 		spinner.addChangeListener(listener);
@@ -176,6 +199,7 @@ public class DrawSwing {
 		pan.add(magB);
 		pan.add(pinkB);
 		pan.add(brownB);
+		pan.add(lockB);
 		pan.add(spinner);
 		pan.add(jcb);
 
@@ -192,6 +216,9 @@ public class DrawSwing {
 		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);
 		f.setResizable(true);
+		
+		wid = f.getSize().width;
+		hei = f.getSize().height;
 	}
 	
 	public JMenuBar menu() {
@@ -215,6 +242,14 @@ public class DrawSwing {
 		menuItem.addActionListener(act);
 		menu.add(menuItem);
 		return menuBar;
+	}
+	
+	public static void setWarningMsg(String text){
+	    Toolkit.getDefaultToolkit().beep();
+	    JOptionPane optionPane = new JOptionPane(text,JOptionPane.WARNING_MESSAGE);
+	    JDialog dialog = optionPane.createDialog("Warning!");
+	    dialog.setAlwaysOnTop(true);
+	    dialog.setVisible(true);
 	}
 
 }
